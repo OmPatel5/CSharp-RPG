@@ -87,6 +87,12 @@ namespace CSharpRPG.Services.CharacterService
             var serviceResponse = new ServiceResponse<GetCharacterDto>();
             var dbCharacter = await _context.Characters.FirstOrDefaultAsync(c => c.Id == id);
 
+            if (dbCharacter is null)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = $"We couldn't find a character with an id of {id}";
+            }
+
            
 
             serviceResponse.Data = _mapper.Map<GetCharacterDto>(dbCharacter);

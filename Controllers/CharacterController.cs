@@ -2,14 +2,17 @@
 using CSharpRPG.Models;
 using CSharpRPG.Services.CharacterService;
 using Microsoft.AspNetCore.Connections.Features;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Runtime.CompilerServices;
 
 namespace CSharpRPG.Controllers
 {
+
     [ApiController]
     [Route("api/[controller]")]
+    [EnableCors("corspolicy")]
     public class CharacterController : ControllerBase
     {
         
@@ -31,7 +34,13 @@ namespace CSharpRPG.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ServiceResponse<GetCharacterDto>>> GetSingle(int id)
         {
-            return Ok(await characterService.GetCharacterById(id));
+            var response = await characterService.GetCharacterById(id);
+
+            if (response.Data is null)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
 
         }
 

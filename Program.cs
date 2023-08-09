@@ -2,6 +2,8 @@ using CSharpRPG.Data;
 using CSharpRPG.Services.CharacterService;
 using Microsoft.EntityFrameworkCore;
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,7 +15,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
-builder.Services.AddScoped<ICharacterService, CharacterService>();  
+builder.Services.AddScoped<ICharacterService, CharacterService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("corspolicy",
+                      policy =>
+                      {
+                          policy.WithOrigins("https://localhost:7010", "https://csharprpgapi.azurewebsites.net").AllowAnyMethod().AllowAnyHeader();
+                          
+                      });
+});
+
+
+
+
 
 var app = builder.Build();
 
@@ -24,7 +40,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("corspolicy");
+
 app.UseHttpsRedirection();
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 
